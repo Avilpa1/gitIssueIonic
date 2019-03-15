@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-navbar color='git'>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>
+      <ion-icon id='gitLogo' name="logo-github"></ion-icon>
+      <span id='navText'>GitIssue</span>
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+
+
+
+  <button ion-button (click)='searchOrgs()'>get</button>
+
+
+ <div *ngFor="let x of out">
+  {{ x.name }}
+</div> 
+
+
+
+
+</ion-content>
+
