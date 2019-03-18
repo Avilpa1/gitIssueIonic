@@ -15,8 +15,9 @@
 
 
   <button ion-button (click)='searchOrgs()'>get</button>
-
-
+  <button ion-button (click)='apiProvider.postIssue()'>post</button>
+  <button ion-button (click)='apiProvider.signInWithGithub()'>Sign In with Github</button>
+  
  <div *ngFor="let x of out">
   {{ x.name }}
 </div> 

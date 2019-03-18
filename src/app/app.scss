@@ -19,6 +19,11 @@
     display: none;
   }
 
+.menu-inner {
+    position: relative;
+    top: 56px;
+}  
+
 #navText {
     position: absolute;
     margin-left: 10px;
@@ -28,4 +33,8 @@
 
 #gitLogo {
     font-size: 37px;
+}
+
+#sideMenu {
+    color: #818181;
 }
