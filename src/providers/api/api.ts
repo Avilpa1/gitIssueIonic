@@ -1,16 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { stringify } from '@angular/core/src/render3/util';
+import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 @Injectable()
 export class ApiProvider {
 
   constructor(public http: HttpClient) {
-    console.log('Hello ApiProvider Provider');
   }
 
+  cors:string = 'https://cors-anywhere.herokuapp.com/'
   githubURL:string = 'https://api.github.com/'
-  githubTokenUrl:string = 'https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token?client_id='
+  githubTokenUrl:string = this.cors + 'https://github.com/login/oauth/access_token?client_id='
   search:any = 'softstackfactory'
   results:any = {
     access_token: ''
@@ -21,15 +23,14 @@ export class ApiProvider {
   token:any 
   
   user:string = 'Avilpa1';
-  repo:string = 'gitIssueIonic';
+  repo:string = 'gitIssue';
 
   body:any = {
     "title": "Found a bug",
     "body": "I'm having a problem with this.",
     "assignees": [
-      "octocat"
+      "avilpa1"
     ],
-    "milestone": 1,
     "labels": [
       "bug"
     ]
@@ -37,8 +38,7 @@ export class ApiProvider {
 
   httpOptions = {
     headers: new HttpHeaders({
-      'Accept':  'application/json',
-      'Origin': 'X-Requested-With'
+      'Accept':  'application/json'
     })
   };
 
@@ -82,20 +82,24 @@ export class ApiProvider {
   }
  
   postIssueURL:string = 'repos/' + this.user + '/' + this.repo + '/' + 'issues'
-  githubURL1:string = 'https://cors-anywhere.herokuapp.com/https://api.github.com/user'
 
   postIssueToUsersRepo() { 
-    console.log(this.githubURL1 + '?access_token=' + this.token)
-    return this.http.post( this.githubURL1 + this.postIssueURL + '?access_token=' + this.token , this.body, this.httpOptions )
+    console.log(this.githubURL + this.postIssueURL + '?access_token=' + this.token)
+    return this.http.post( this.githubURL + this.postIssueURL + '?access_token=' + this.token , this.body, this.httpOptions )
   };
 
   postIssue() {
     this.postIssueToUsersRepo()
-      this.getAccessTokenFromGithub()
         .subscribe( (response) =>  {
           let out = response
           console.log(out)   
     })
   }
 
+
+  textArea:any = { }
+
+  test() {
+    console.log(this.textArea)
+  }
 }
