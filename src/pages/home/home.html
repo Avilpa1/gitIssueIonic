@@ -14,10 +14,11 @@
 
 
 
-  <button ion-button (click)='searchOrgs()'>get</button>
+  <button ion-button (click)='signIn()'>get</button>
   <button ion-button (click)='apiProvider.postIssue()'>post</button>
   <button ion-button (click)='apiProvider.signInWithGithub()'>Sign In with Github</button>
-  
+  <!-- <button ion-button (click)='apiProvider.accessToken()'>Access Token</button> -->
+  <!-- <button ion-button (click)='apiProvider.getCodeFromGithub()'>get code</button> -->
  <div *ngFor="let x of out">
   {{ x.name }}
 </div> 
