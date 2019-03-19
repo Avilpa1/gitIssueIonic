@@ -26,14 +26,10 @@ export class ApiProvider {
   repo:string = 'gitIssue';
 
   body:any = {
-    "title": "Found a bug",
-    "body": "I'm having a problem with this.",
-    "assignees": [
-      "avilpa1"
-    ],
-    "labels": [
-      "bug"
-    ]
+    "title": "",
+    "body": "",
+    "assignees": [ "" ],
+    "labels": [ "" ]
   }
 
   httpOptions = {
@@ -97,9 +93,48 @@ export class ApiProvider {
   }
 
 
-  textArea:any = { }
+  textArea:any
+
+  getHashTags(inputText) {  
+    var regex = /(?:^|\s)(?:#)([a-zA-Z\d]+)/gm;
+    var matches = [];
+    var match;
+
+    while ((match = regex.exec(inputText))) {
+        matches.push(match[1]);
+    }
+
+    return matches;
+  }
+
+  getAtTags(inputText) {  
+    var regex = /(?:^|\s)(?:@)([a-zA-Z\d]+)/gm;
+    var matches = [];
+    var match;
+
+    while ((match = regex.exec(inputText))) {
+        matches.push(match[1]);
+    }
+
+    return matches;
+  }
+
+  removeAtAndHashTag(inputText) {
+    let at = /(?:^|\s)(?:@)([a-zA-Z\d]+)/gm;
+    let hash = /(?:^|\s)(?:#)([a-zA-Z\d]+)/gm;
+    let out1 = inputText.replace(at, "");
+    let out2 = out1.replace(hash, "");
+    let res = out2.split(",");
+
+    return res;
+  }
 
   test() {
-    console.log(this.textArea)
+    this.body.title = this.removeAtAndHashTag(this.textArea)[0]
+    this.body.body = this.removeAtAndHashTag(this.textArea)[1]
+    this.body.labels = this.getHashTags(this.textArea)
+    this.body.assignees = this.getAtTags(this.textArea)
+
+    console.log(this.body)
   }
 }
