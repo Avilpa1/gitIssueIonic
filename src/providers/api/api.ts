@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { stringify } from '@angular/core/src/render3/util';
-import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 @Injectable()
 export class ApiProvider {
@@ -13,7 +11,7 @@ export class ApiProvider {
   cors:string = 'https://cors-anywhere.herokuapp.com/'
   githubURL:string = 'https://api.github.com/'
   githubTokenUrl:string = this.cors + 'https://github.com/login/oauth/access_token?client_id='
-  search:any = 'softstackfactory'
+  searchRequest:any = ''
   results:any = {
     access_token: ''
   }
@@ -21,10 +19,11 @@ export class ApiProvider {
   client_Secret:any = 'bb041c31307f2b955ccc0a62a5022fea2b9185fa'
   code:any = {}
   token:any 
-  
+  out:any
+  loggedIn:any = true
   user:string = 'Avilpa1';
   repo:string = 'gitIssue';
-
+  issue:string = '';
   body:any = {
     "title": "",
     "body": "",
@@ -42,7 +41,17 @@ export class ApiProvider {
     window.location.href='https://github.com/login/oauth/authorize' + '?client_id=' + this.client_Id + '&scope=repo,user';
   }
 
-  getCodeFromGithub() {
+  githubUserInfo:object = {}
+  getUserinfoFromGithub() {
+    this.http.get( this.githubURL + 'user?access_token=' + this.token )
+      .subscribe( (response) =>  {
+        this.githubUserInfo = response
+        console.log(this.githubUserInfo)
+        this.loggedIn = false
+      })
+  }
+
+  getCodeFromGithubUrl() {
     let url = window.location.href
 
     let getParams = function (url) {
@@ -67,24 +76,28 @@ export class ApiProvider {
   }
 
   accessToken() {
-    this.getCodeFromGithub()
+    this.getCodeFromGithubUrl()
       this.getAccessTokenFromGithub()
         .subscribe( (response) =>  {
           this.results = response
           this.token = this.results.access_token
-          console.log(this.token)  
-          // this.postIssue()
+          console.log(this.token)
+          if (this.token != undefined) {
+            this.getUserinfoFromGithub()
+          }
     })
   }
  
-  postIssueURL:string = 'repos/' + this.user + '/' + this.repo + '/' + 'issues'
+  postIssueURL:string
 
   postIssueToUsersRepo() { 
+    this.postIssueURL = 'repos/' + this.searchRequest + '/' + this.repo + '/' + 'issues'
     console.log(this.githubURL + this.postIssueURL + '?access_token=' + this.token)
     return this.http.post( this.githubURL + this.postIssueURL + '?access_token=' + this.token , this.body, this.httpOptions )
   };
 
   postIssue() {
+    this.constructIssueObject()
     this.postIssueToUsersRepo()
         .subscribe( (response) =>  {
           let out = response
@@ -129,12 +142,46 @@ export class ApiProvider {
     return res;
   }
 
-  test() {
+  constructIssueObject() {
     this.body.title = this.removeAtAndHashTag(this.textArea)[0]
     this.body.body = this.removeAtAndHashTag(this.textArea)[1]
     this.body.labels = this.getHashTags(this.textArea)
-    this.body.assignees = this.getAtTags(this.textArea)
+    // this.body.assignees = this.getAtTags(this.textArea)
 
     console.log(this.body)
   }
+
+  search(x:any) {
+    if( x == '13') {
+        this.searchOrg()
+    }
+  }
+
+  searchOrg() {
+     fetch(this.githubURL + 'orgs/' + this.searchRequest + '/repos?sort=created')
+    .then(response => response.json())
+    .then(json => {
+        this.out = json
+        console.log(this.out)
+        })
+  }
+
+  repoIssuesResults:any
+  searchRepoIssues(x:any) {
+    this.http.get( this.githubURL + 'repos/' + this.searchRequest + '/' + this.out[x].name + '/issues' )
+      .subscribe( (response) =>  {
+        this.repoIssuesResults = response
+        console.log(this.repoIssuesResults)
+        this.setRepoAndIssue(this.searchRequest, this.out[x].name)
+      })
+  }
+
+  setRepoAndIssue(user, repo) {
+    this.user = user
+    this.repo = repo
+  }
+  
+
+
 }
+

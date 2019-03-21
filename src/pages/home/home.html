@@ -6,31 +6,64 @@
     <ion-title>
       <ion-icon id='gitLogo' name="logo-github"></ion-icon>
       <span id='navText'>GitIssue</span>
+          <button *ngIf='apiProvider.loggedIn' ion-button (click)='signIn()' clear small float-right>Sign In</button>
+              <ion-chip color='black' *ngIf='!apiProvider.loggedIn' float-right>
+                  <ion-label>{{ apiProvider.githubUserInfo.login }}</ion-label>
+                <ion-avatar>
+                 <img [src]="apiProvider.githubUserInfo.avatar_url" >
+               </ion-avatar>
+              </ion-chip>
     </ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-menu [content]="content">
+    <ion-header>
+      <ion-toolbar>
+          <ion-searchbar [(ngModel)]='apiProvider.searchRequest' (keypress)="apiProvider.search($event.keyCode)" mode='ios'></ion-searchbar>
+      </ion-toolbar>
+    </ion-header>
+  
+    <ion-content>
+      <ion-list>
+        <button menuClose ion-item *ngFor="let p of apiProvider.out; let i=index" (click)="apiProvider.searchRepoIssues(i)">
+          {{ p.name }}
+        </button>
+      </ion-list>
+    </ion-content>
+  
+  </ion-menu>
+
+<ion-content id='content' padding>
 
 
-
-  <button ion-button (click)='searchOrgs()'>get</button>
-  <button ion-button (click)='apiProvider.postIssue()'>post</button>
-  <button ion-button (click)='apiProvider.signInWithGithub()'>Sign In with Github</button>
-
-  <ion-item>
-      <ion-label>Notes</ion-label>
-      <ion-textarea [(ngModel)]='apiProvider.textArea' rows="6" cols="20"></ion-textarea>
+<ion-card padding>
+    <ion-item>
+      <ion-label>Create a new Issue..</ion-label>
+      <ion-textarea id='textArea' (keypress)="onChange($event.keyCode)" [(ngModel)]='apiProvider.textArea' rows="6" cols="20"></ion-textarea>
   </ion-item>
-  <button ion-button (click)='apiProvider.test()'>Submit</button>
+  <ion-item>
+    <ion-label>
+      {{ apiProvider.user }}/{{ apiProvider.repo }}
+    </ion-label>
+    <button ion-button (click)='apiProvider.postIssue()' item-right>Submit</button>
+  </ion-item>
+</ion-card>
 
+  <ion-card>
+    <div *ngFor="let x of apiProvider.repoIssuesResults; let i = index">
 
- <div *ngFor="let x of out">
-  {{ x.name }}
-</div> 
+        <ion-card-header>
+          <ion-card-title>{{ x.title }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+            {{ x.body }}
+        </ion-card-content>
 
-
+      </div> 
+  </ion-card>
 
 
 </ion-content>
 
+<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>

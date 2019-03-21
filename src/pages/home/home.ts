@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, ToastController } from 'ionic-angular';
 import { ApiProvider } from '../../providers/api/api';
-import { CodegenComponentFactoryResolver } from '@angular/core/src/linker/component_factory_resolver';
+import { MenuController } from 'ionic-angular';
 
 @Component({
   selector: 'page-home',
@@ -10,7 +10,9 @@ import { CodegenComponentFactoryResolver } from '@angular/core/src/linker/compon
 export class HomePage {
 
   constructor(public navCtrl: NavController,
-              public apiProvider: ApiProvider) {
+              public apiProvider: ApiProvider,
+              public menuCtrl: MenuController,
+              public toast: ToastController) {
 
   }
 
@@ -19,20 +21,52 @@ export class HomePage {
     this.apiProvider.accessToken()
   }
 
-  APIurl:string = 'https://api.github.com/'
-  search:any = 'softstackfactory'
-  out:any
-
-   searchOrgs() {
-
-     fetch(this.APIurl + 'orgs/' + this.search + '/repos?sort=created')
-    .then(response => response.json())
-    .then(json => {
-        this.out = json
-        console.log(this.out)
-        })
+  async presentToast() {
+    const toast = await this.toast.create({
+      message: 'Signing in with Github..',
+      duration: 3000,
+      position: 'middle'
+    });
+    toast.present();
   }
 
- }
+  signIn() {
+    this.presentToast()
+    this.apiProvider.signInWithGithub()
+  }
+
+  users:any = {
+    'paul': 'Avilpa1',
+    'alex': 'AlexRingrose',
+    'benji': 'bdarey',
+    'khoa': 'khoadnguyen'
+  }
+  
+  onChange(x:any) {
+    if( x == '32') {
+      this.textAreaUserNameCheck()
+    }
+  }
+  
+
+  textAreaUserNameCheck() {
+    let matches:any = []
+    let textAreaLower = this.apiProvider.textArea.toLowerCase()
+    let AtTag:any = this.apiProvider.getAtTags(textAreaLower)
+
+    for(let x=0; x < AtTag.length; x++) {
+      if (AtTag[x] in this.users) {
+        matches.push(this.users[AtTag[x]])
+        this.apiProvider.body.assignees = matches
+      } else {
+        matches.push(AtTag[x])
+        this.apiProvider.body.assignees = matches
+      }
+      console.log(this.apiProvider.body.assignees)
+    }
+
+  }
 
 
+
+}
