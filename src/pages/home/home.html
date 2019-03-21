@@ -26,7 +26,7 @@
   
     <ion-content>
       <ion-list>
-        <button menuClose ion-item *ngFor="let p of apiProvider.out; let i=index" (click)="apiProvider.searchRepoIssues(i)">
+        <button menuClose ion-item *ngFor="let p of apiProvider.repos; let i=index" (click)="apiProvider.searchRepoIssues(i)">
           {{ p.name }}
         </button>
       </ion-list>
@@ -36,34 +36,51 @@
 
 <ion-content id='content' padding>
 
-
+<div id='content-wrapper'>
 <ion-card padding>
+    <ion-card-title *ngIf='apiProvider.user'>
+        {{ apiProvider.user }}/{{ apiProvider.repo }}
+      </ion-card-title>
     <ion-item>
       <ion-label>Create a new Issue..</ion-label>
       <ion-textarea id='textArea' (keypress)="onChange($event.keyCode)" [(ngModel)]='apiProvider.textArea' rows="6" cols="20"></ion-textarea>
   </ion-item>
   <ion-item>
-    <ion-label>
-      {{ apiProvider.user }}/{{ apiProvider.repo }}
-    </ion-label>
     <button ion-button (click)='apiProvider.postIssue()' item-right>Submit</button>
   </ion-item>
 </ion-card>
 
+<div *ngFor="let x of apiProvider.repoIssuesResults; let i = index">
   <ion-card>
-    <div *ngFor="let x of apiProvider.repoIssuesResults; let i = index">
-
-        <ion-card-header>
-          <ion-card-title>{{ x.title }}</ion-card-title>
+          <ion-card-header style='background-color: silver;'>
+          <ion-card-title text-wrap>
+            {{ x.title }} 
+            <span id='issueNumber'>
+              #{{ x.number }}
+            </span>
+          </ion-card-title>
+          <ion-chip *ngIf='x.user' color='git' float-right>
+              <ion-label>{{ x.user.login }}</ion-label>
+            <ion-avatar>
+             <img [src]="x.user.avatar_url" >
+           </ion-avatar>
+          </ion-chip>
+          <div *ngIf='x.assignee'>
+              <ion-chip *ngFor='let z of x.assignees' color='git' float-right>
+                  <ion-label>{{ z.login }}</ion-label>
+                <ion-avatar>
+                 <img [src]="z.avatar_url" >
+               </ion-avatar>
+              </ion-chip>  
+          </div>
         </ion-card-header>
-        <ion-card-content>
+
+        <ion-card-content style='white-space: pre-line'>
             {{ x.body }}
         </ion-card-content>
-
-      </div> 
   </ion-card>
-
-
+</div> 
+</div>
 </ion-content>
 
 <ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>

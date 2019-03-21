@@ -19,10 +19,10 @@ export class ApiProvider {
   client_Secret:any = 'bb041c31307f2b955ccc0a62a5022fea2b9185fa'
   code:any = {}
   token:any 
-  out:any
+  repos:any
   loggedIn:any = true
-  user:string = 'Avilpa1';
-  repo:string = 'gitIssue';
+  user:string = '';
+  repo:string = '';
   issue:string = '';
   body:any = {
     "title": "",
@@ -41,13 +41,16 @@ export class ApiProvider {
     window.location.href='https://github.com/login/oauth/authorize' + '?client_id=' + this.client_Id + '&scope=repo,user';
   }
 
-  githubUserInfo:object = {}
+  githubUserInfo:any
   getUserinfoFromGithub() {
     this.http.get( this.githubURL + 'user?access_token=' + this.token )
       .subscribe( (response) =>  {
         this.githubUserInfo = response
         console.log(this.githubUserInfo)
         this.loggedIn = false
+        this.searchRequest = this.githubUserInfo.login
+        this.user = this.githubUserInfo.login
+        this.getUserRepos()
       })
   }
 
@@ -90,7 +93,7 @@ export class ApiProvider {
  
   postIssueURL:string
 
-  postIssueToUsersRepo() { 
+  postIssueToRepo() { 
     this.postIssueURL = 'repos/' + this.searchRequest + '/' + this.repo + '/' + 'issues'
     console.log(this.githubURL + this.postIssueURL + '?access_token=' + this.token)
     return this.http.post( this.githubURL + this.postIssueURL + '?access_token=' + this.token , this.body, this.httpOptions )
@@ -98,20 +101,21 @@ export class ApiProvider {
 
   postIssue() {
     this.constructIssueObject()
-    this.postIssueToUsersRepo()
+    this.postIssueToRepo()
         .subscribe( (response) =>  {
           let out = response
-          console.log(out)   
+          console.log(out)
+          this.updateRepoIssueResult()
     })
   }
 
 
   textArea:any
 
-  getHashTags(inputText) {  
-    var regex = /(?:^|\s)(?:#)([a-zA-Z\d]+)/gm;
-    var matches = [];
-    var match;
+  getMoneyTags(inputText) {  
+    let regex = /(?:^|\s)(?:%)([a-zA-Z\d]+)/gm;
+    let matches = [];
+    let match;
 
     while ((match = regex.exec(inputText))) {
         matches.push(match[1]);
@@ -121,9 +125,9 @@ export class ApiProvider {
   }
 
   getAtTags(inputText) {  
-    var regex = /(?:^|\s)(?:@)([a-zA-Z\d]+)/gm;
-    var matches = [];
-    var match;
+    let regex = /(?:^|\s)(?:@)([a-zA-Z\d]+)/gm;
+    let matches = [];
+    let match;
 
     while ((match = regex.exec(inputText))) {
         matches.push(match[1]);
@@ -133,10 +137,10 @@ export class ApiProvider {
   }
 
   removeAtAndHashTag(inputText) {
-    let at = /(?:^|\s)(?:@)([a-zA-Z\d]+)/gm;
-    let hash = /(?:^|\s)(?:#)([a-zA-Z\d]+)/gm;
-    let out1 = inputText.replace(at, "");
-    let out2 = out1.replace(hash, "");
+    // let at = /(?:^|\s)(?:@)([a-zA-Z\d]+)/gm;
+    let hash = /(?:^|\s)(?:%)([a-zA-Z\d]+)/gm;
+    // let out1 = inputText.replace(at, at);
+    let out2 = inputText.replace(hash, '');
     let res = out2.split(",");
 
     return res;
@@ -145,7 +149,7 @@ export class ApiProvider {
   constructIssueObject() {
     this.body.title = this.removeAtAndHashTag(this.textArea)[0]
     this.body.body = this.removeAtAndHashTag(this.textArea)[1]
-    this.body.labels = this.getHashTags(this.textArea)
+    this.body.labels = this.getMoneyTags(this.textArea)
     // this.body.assignees = this.getAtTags(this.textArea)
 
     console.log(this.body)
@@ -161,19 +165,29 @@ export class ApiProvider {
      fetch(this.githubURL + 'orgs/' + this.searchRequest + '/repos?sort=created')
     .then(response => response.json())
     .then(json => {
-        this.out = json
-        console.log(this.out)
+        this.repos = json
+        console.log(this.repos)
         })
   }
 
   repoIssuesResults:any
+  currentUserAndRepo:any
   searchRepoIssues(x:any) {
-    this.http.get( this.githubURL + 'repos/' + this.searchRequest + '/' + this.out[x].name + '/issues' )
+    this.currentUserAndRepo = this.githubURL + 'repos/' + this.searchRequest + '/' + this.repos[x].name + '/issues'
+    this.http.get( this.currentUserAndRepo )
       .subscribe( (response) =>  {
         this.repoIssuesResults = response
         console.log(this.repoIssuesResults)
-        this.setRepoAndIssue(this.searchRequest, this.out[x].name)
+        this.setRepoAndIssue(this.searchRequest, this.repos[x].name)
       })
+  }
+
+  updateRepoIssueResult() {
+    this.http.get( this.currentUserAndRepo )
+    .subscribe( (response) =>  {
+      this.repoIssuesResults = response
+      console.log(this.repoIssuesResults)
+    })
   }
 
   setRepoAndIssue(user, repo) {
@@ -181,6 +195,13 @@ export class ApiProvider {
     this.repo = repo
   }
   
+  getUserRepos() {
+    this.http.get( this.githubURL + 'user/repos?access_token=' + this.token )
+    .subscribe( (response) =>  {
+      this.repos = response
+      console.log(this.repos)
+    })
+  }
 
 
 }

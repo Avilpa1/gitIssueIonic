@@ -43,7 +43,7 @@ export class HomePage {
   }
   
   onChange(x:any) {
-    if( x == '32') {
+    if( x == '32' || x == '13') {
       this.textAreaUserNameCheck()
     }
   }
