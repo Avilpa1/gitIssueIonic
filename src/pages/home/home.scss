@@ -21,6 +21,15 @@ page-home {
         letter-spacing: -1px;
     }
 
+    .chip-md, .chip-ios {
+        border-radius: 12px;
+        margin: 2px 1px;
+    }
+
+    ion-chip ion-avatar img {
+        border-radius: 0% 30% 30% 0%;
+    }
+
     @media only screen and (min-width: 950px) {
         #content-wrapper {
           margin-left: 25%;

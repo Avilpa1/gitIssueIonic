@@ -120,7 +120,6 @@ export class ApiProvider {
     while ((match = regex.exec(inputText))) {
         matches.push(match[1]);
     }
-
     return matches;
   }
 
@@ -132,7 +131,6 @@ export class ApiProvider {
     while ((match = regex.exec(inputText))) {
         matches.push(match[1]);
     }
-
     return matches;
   }
 

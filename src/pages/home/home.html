@@ -46,7 +46,7 @@
       <ion-textarea id='textArea' (keypress)="onChange($event.keyCode)" [(ngModel)]='apiProvider.textArea' rows="6" cols="20"></ion-textarea>
   </ion-item>
   <ion-item>
-    <button ion-button (click)='apiProvider.postIssue()' item-right>Submit</button>
+    <button [disabled]='!apiProvider.repo' ion-button (click)='apiProvider.postIssue()' item-right>Submit</button>
   </ion-item>
 </ion-card>
 
@@ -66,12 +66,14 @@
            </ion-avatar>
           </ion-chip>
           <div *ngIf='x.assignee'>
-              <ion-chip *ngFor='let z of x.assignees' color='git' float-right>
+            <Div *ngFor='let z of x.assignees'>
+              <ion-chip *ngIf='x.user.login != z.login' color='git' float-right>
                   <ion-label>{{ z.login }}</ion-label>
                 <ion-avatar>
                  <img [src]="z.avatar_url" >
                </ion-avatar>
               </ion-chip>  
+            </Div> 
           </div>
         </ion-card-header>
 
