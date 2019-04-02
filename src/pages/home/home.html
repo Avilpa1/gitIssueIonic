@@ -46,6 +46,18 @@
       <ion-textarea id='textArea' (keypress)="onChange($event.keyCode)" [(ngModel)]='apiProvider.textArea' rows="6" cols="20"></ion-textarea>
   </ion-item>
   <ion-item>
+    <div id='markdownContainer'>
+      <button ion-button class='markdown-buttons' (click)='markdown("### ")' item-right>###</button>
+      <button ion-button class='markdown-buttons' (click)='markdown("****")' item-right>****</button>
+      <button ion-button class='markdown-buttons' (click)='markdown("__")' item-right>__</button>
+      <button ion-button class='markdown-buttons' (click)='markdown(">")' item-right>></button>
+      <button ion-button class='markdown-buttons' (click)='markdown("``")' item-right>``</button>
+      <button ion-button class='markdown-buttons' (click)='markdown("[](url)")' item-right>[](url)</button>
+      <button ion-button class='markdown-buttons' (click)='markdown("- ")' item-right>-</button>
+      <button ion-button class='markdown-buttons' (click)='markdown("1. ")' item-right>1.</button>
+      <button ion-button class='markdown-buttons' (click)='markdown("@")' item-right>@</button>
+      <button ion-button class='markdown-buttons' (click)='markdown("#")' item-right>#</button>
+    </div>
     <button [disabled]='!apiProvider.repo' ion-button (click)='apiProvider.postIssue()' item-right>Submit</button>
   </ion-item>
 </ion-card>
@@ -59,6 +71,13 @@
               #{{ x.number }}
             </span>
           </ion-card-title>
+          <span *ngFor="let l of x.labels;">
+            <ion-chip float-left>
+              <ion-label>{{ l.name }}</ion-label>
+          </ion-chip>
+          </span>
+
+
           <ion-chip *ngIf='x.user' color='git' float-right>
               <ion-label>{{ x.user.login }}</ion-label>
             <ion-avatar>

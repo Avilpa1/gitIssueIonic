@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, ToastController } from 'ionic-angular';
+import { NavController, ToastController, TextInput } from 'ionic-angular';
 import { ApiProvider } from '../../providers/api/api';
 import { MenuController } from 'ionic-angular';
 
@@ -12,13 +12,13 @@ export class HomePage {
   constructor(public navCtrl: NavController,
               public apiProvider: ApiProvider,
               public menuCtrl: MenuController,
-              public toast: ToastController) {
-
-  }
-
+              public toast: ToastController, 
+              // public textArea: TextInput
+              ) {}
 
   ionViewDidEnter() {
-    this.apiProvider.accessToken()
+    this.apiProvider.accessToken();
+    this.apiProvider.textArea = "";
   }
 
   async presentToast() {
@@ -43,12 +43,14 @@ export class HomePage {
   }
   
   onChange(x:any) {
+    // console.log(this.apiProvider.textArea)
     if( x == '32' || x == '13') {
-      this.textAreaUserNameCheck()
+      if(this.apiProvider.textArea != undefined) {
+        this.textAreaUserNameCheck()
+      }
     }
   }
   
-
   textAreaUserNameCheck() {
     let matches:any = []
     let textAreaLower = this.apiProvider.textArea.toLowerCase()
@@ -64,9 +66,20 @@ export class HomePage {
       }
       console.log(this.apiProvider.body.assignees)
     }
+  }
 
+  markdown(x) {
+    this.apiProvider.textArea = this.apiProvider.textArea + ' ' + x
+
+    let input:any = document.getElementById("textArea");
+    // this.textArea.setFocus()
   }
 
 
+
+  
+  // input.addEventListener('keypress', (event) => {
+  //   console.log("You have pressed key: ", event.key);
+  // });
 
 }

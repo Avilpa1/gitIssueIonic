@@ -1,29 +1,37 @@
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MenuController } from 'ionic-angular';
 
 @Injectable()
 export class ApiProvider {
 
-  constructor(public http: HttpClient) {
+  constructor(public http: HttpClient,
+              public menuCtrl: MenuController) {
   }
 
-  cors:string = 'https://cors-anywhere.herokuapp.com/'
-  githubURL:string = 'https://api.github.com/'
-  githubTokenUrl:string = this.cors + 'https://github.com/login/oauth/access_token?client_id='
-  searchRequest:any = ''
+  cors:string = 'https://cors-anywhere.herokuapp.com/';
+  githubURL:string = 'https://api.github.com/';
+  githubTokenUrl:string = this.cors + 'https://github.com/login/oauth/access_token?client_id=';
+  searchRequest:any = '';
   results:any = {
     access_token: ''
-  }
-  client_Id:any = '77b4f0d9a42a38fe7949'
-  client_Secret:any = 'bb041c31307f2b955ccc0a62a5022fea2b9185fa'
-  code:any = {}
-  token:any 
-  repos:any
-  loggedIn:any = true
+  };
+  client_Id:any = '77b4f0d9a42a38fe7949';
+  client_Secret:any = 'bb041c31307f2b955ccc0a62a5022fea2b9185fa';
+  code:any = {};
+  token:any;
+  repos:any;
+  loggedIn:any = true;
   user:string = '';
   repo:string = '';
   issue:string = '';
+  textArea:string;
+  postIssueURL:string;
+  repoIssuesResults:any;
+  currentUserAndRepo:any;
+  githubUserInfo:any;
+  newPostId:any;
   body:any = {
     "title": "",
     "body": "",
@@ -41,7 +49,6 @@ export class ApiProvider {
     window.location.href='https://github.com/login/oauth/authorize' + '?client_id=' + this.client_Id + '&scope=repo,user';
   }
 
-  githubUserInfo:any
   getUserinfoFromGithub() {
     this.http.get( this.githubURL + 'user?access_token=' + this.token )
       .subscribe( (response) =>  {
@@ -90,8 +97,6 @@ export class ApiProvider {
           }
     })
   }
- 
-  postIssueURL:string
 
   postIssueToRepo() { 
     this.postIssueURL = 'repos/' + this.searchRequest + '/' + this.repo + '/' + 'issues'
@@ -103,14 +108,13 @@ export class ApiProvider {
     this.constructIssueObject()
     this.postIssueToRepo()
         .subscribe( (response) =>  {
-          let out = response
+          let out:any = response
           console.log(out)
+          this.textArea = ''
+          this.newPostId = out.id
           this.updateRepoIssueResult()
     })
   }
-
-
-  textArea:any
 
   getMoneyTags(inputText) {  
     let regex = /(?:^|\s)(?:%)([a-zA-Z\d]+)/gm;
@@ -127,7 +131,6 @@ export class ApiProvider {
     let regex = /(?:^|\s)(?:@)([a-zA-Z\d]+)/gm;
     let matches = [];
     let match;
-
     while ((match = regex.exec(inputText))) {
         matches.push(match[1]);
     }
@@ -149,7 +152,6 @@ export class ApiProvider {
     this.body.body = this.removeAtAndHashTag(this.textArea)[1]
     this.body.labels = this.getMoneyTags(this.textArea)
     // this.body.assignees = this.getAtTags(this.textArea)
-
     console.log(this.body)
   }
 
@@ -168,8 +170,6 @@ export class ApiProvider {
         })
   }
 
-  repoIssuesResults:any
-  currentUserAndRepo:any
   searchRepoIssues(x:any) {
     this.currentUserAndRepo = this.githubURL + 'repos/' + this.searchRequest + '/' + this.repos[x].name + '/issues'
     this.http.get( this.currentUserAndRepo )
@@ -181,6 +181,7 @@ export class ApiProvider {
   }
 
   updateRepoIssueResult() {
+    console.log('updating issues')
     this.http.get( this.currentUserAndRepo )
     .subscribe( (response) =>  {
       this.repoIssuesResults = response
@@ -198,6 +199,7 @@ export class ApiProvider {
     .subscribe( (response) =>  {
       this.repos = response
       console.log(this.repos)
+      this.menuCtrl.open();
     })
   }
 
